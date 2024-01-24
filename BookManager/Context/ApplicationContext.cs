@@ -7,8 +7,16 @@ namespace BookManager.Context
     public class ApplicationContext : DbContext
     {
         public DbSet<Author> Authors => Set<Author>();
-        public DbSet<Book> Books => Set<Book>();
         public DbSet<Genre> Genres => Set<Genre>();
+        public DbSet<Publisher> Publishers => Set<Publisher>();
+        public DbSet<Book> Books => Set<Book>();
+
+        public ApplicationContext()
+        {
+            // ToDo: Remove
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
