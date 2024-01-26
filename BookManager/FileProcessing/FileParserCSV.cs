@@ -1,27 +1,27 @@
 ﻿using BookManager.Context;
+using BookManager.Utils;
 
 namespace BookManager.FileProcessing
 {
     public class FileParserCSV : IFileParser
     {
         public IDatabaseManager DatabaseManager { get; }
-        private readonly IList<ColumnName> _fileColumnOrder;
+        private readonly List<ColumnName> _fileColumnOrder;
 
-        public FileParserCSV()
+        public FileParserCSV(IDatabaseManager databaseManager)
         {
-            DatabaseManager = new DatabaseManager();
-            _fileColumnOrder = new List<ColumnName>();
+            DatabaseManager = databaseManager;
+            _fileColumnOrder = [];
         }
 
         public void Parse(string pathCSV)
         {
-            // ToDo: Validator.ValidateFile();
+            ValidatorCSV validator = new();
+            validator.Validate(pathCSV);
 
-            using (StreamReader reader = new(pathCSV))
-            {
-                ProcessHeaderCSV(reader);
-                FillDatabase(reader);
-            }
+            using StreamReader reader = new(pathCSV);
+            ProcessHeaderCSV(reader);
+            FillDatabase(reader);
         }
 
         private void ProcessHeaderCSV(StreamReader reader)
@@ -29,20 +29,10 @@ namespace BookManager.FileProcessing
             string line = reader.ReadLine()!;
             string[] columnNames = line.Split(',');
 
-            // ToDo: ValidatorCSV.ValidateColumnName() Count = 6
-
             foreach (string column in columnNames)
             {
-                bool check = Enum.TryParse(column, out ColumnName header);
-
-                if (check == false)
-                {
-                    throw new InvalidOperationException("Incorrect header name");
-                }
-                else
-                {
-                    _fileColumnOrder.Add(header);
-                }
+                ColumnName header = (ColumnName)Enum.Parse(typeof(ColumnName), column);
+                _fileColumnOrder.Add(header);
             }
         }
 
@@ -57,8 +47,8 @@ namespace BookManager.FileProcessing
                 int genreId = ProcessGenre(columnNames);
                 int authorId = ProcessAuthor(columnNames);
                 int publisherId = ProcessPublisher(columnNames);
-                
-                ProcessBook(columnNames, genreId, authorId, publisherId);    
+
+                ProcessBook(columnNames, genreId, authorId, publisherId);
             }
         }
 
@@ -99,10 +89,7 @@ namespace BookManager.FileProcessing
             string pages = columns[indexPages];
             string releaseDate = columns[indexReleaseDate];
 
-            // ToDo: Add completely convert validation
-            // DatabaseManager.InsertBook(title, Convert.ToInt32(pages), Convert.ToDateTime(releaseDate), genreId, authorId, publisherId);
-            // ToDo: Error convert DateTime «8th century DC»
-            DatabaseManager.InsertBook(title, Convert.ToInt32(pages), new DateTime(2022, 10, 27), genreId, authorId, publisherId);
+            DatabaseManager.InsertBook(title, Convert.ToInt32(pages), Convert.ToDateTime(releaseDate), genreId, authorId, publisherId);
         }
     }
 }
