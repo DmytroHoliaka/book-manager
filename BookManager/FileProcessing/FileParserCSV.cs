@@ -1,11 +1,14 @@
-﻿using BookManager.Context;
-using BookManager.Utils;
+﻿using BookManager.Database;
+using BookManager.Validators;
 
 namespace BookManager.FileProcessing
 {
     public class FileParserCSV : IFileParser
     {
         public IDatabaseManager DatabaseManager { get; }
+        public List<ColumnName> FileColumnOrder =>
+            _fileColumnOrder.ConvertAll(name => name);
+
         private readonly List<ColumnName> _fileColumnOrder;
 
         public FileParserCSV(IDatabaseManager databaseManager)
@@ -79,7 +82,7 @@ namespace BookManager.FileProcessing
             return publisherId;
         }
 
-        private void ProcessBook(string[] columns, int genreId, int authorId, int publisherId)
+        private void ProcessBook(string[] columns, int genreId, int? authorId, int? publisherId)
         {
             int indexTitle = _fileColumnOrder.IndexOf(ColumnName.Title);
             int indexPages = _fileColumnOrder.IndexOf(ColumnName.Pages);
@@ -87,9 +90,11 @@ namespace BookManager.FileProcessing
 
             string title = columns[indexTitle];
             string pages = columns[indexPages];
-            string releaseDate = columns[indexReleaseDate];
 
-            DatabaseManager.InsertBook(title, Convert.ToInt32(pages), Convert.ToDateTime(releaseDate), genreId, authorId, publisherId);
+            string? releaseDateStr = columns[indexReleaseDate] == string.Empty ? null : columns[indexReleaseDate];
+            DateTime? releaseDate = releaseDateStr is null ? null : Convert.ToDateTime(releaseDateStr);
+
+            DatabaseManager.InsertBook(title, Convert.ToInt32(pages), releaseDate, genreId, authorId, publisherId);
         }
     }
 }
