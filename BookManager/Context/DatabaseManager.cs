@@ -1,5 +1,4 @@
 ﻿using BookManager.Entities;
-using System;
 
 namespace BookManager.Context
 {
@@ -15,6 +14,13 @@ namespace BookManager.Context
 
         public int InsertAuthor(string authorName)
         {
+            Author? duplicate = _db.Authors.FirstOrDefault(a => a.Name == authorName);
+
+            if (duplicate is not null)
+            {
+                return duplicate.Id;
+            }
+
             Author author = new()
             {
                 Name = authorName,
@@ -28,6 +34,13 @@ namespace BookManager.Context
 
         public int InsertGenre(string genreName)
         {
+            Genre? duplicate = _db.Genres.FirstOrDefault(d => d.Name == genreName);
+
+            if (duplicate is not null)
+            {
+                return duplicate.Id;
+            }
+
             Genre genre = new()
             {
                 Name = genreName,
@@ -41,6 +54,13 @@ namespace BookManager.Context
 
         public int InsertPublisher(string publisherName)
         {
+            Publisher? duplicate = _db.Publishers.FirstOrDefault(p => p.Name == publisherName);
+
+            if (duplicate is not null)
+            {
+                return duplicate.Id;
+            }
+
             Publisher publisher = new()
             {
                 Name = publisherName,
@@ -54,6 +74,18 @@ namespace BookManager.Context
 
         public int InsertBook(string title, int pages, DateTime releaseDate, int genreId, int authorId, int publisherId)
         {
+            Book? duplicate = _db.Books.FirstOrDefault(b => b.Title == title &&
+                                                           b.Pages == pages &&
+                                                           b.ReleaseDate == releaseDate &&
+                                                           b.GenreId == genreId &&
+                                                           b.AuthorId == authorId &&
+                                                           b.PublisherId == publisherId);
+
+            if (duplicate is not null)
+            {
+                return duplicate.Id;
+            }
+
             Book book = new()
             {
                 Title = title,
