@@ -1,7 +1,8 @@
 ﻿using BookManager.FileProcessing;
 
-namespace BookManager.Utils
+namespace BookManager.Validators
 {
+    // ToDo: Add emply column validators
     public class ValidatorCSV : IFileValidator
     {
         public IEnumerable<ParseError> Errors =>

@@ -1,4 +1,4 @@
-﻿namespace BookManager.Utils
+﻿namespace BookManager.Validators
 {
     public interface IFileValidator
     {

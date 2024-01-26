@@ -1,7 +1,7 @@
 ﻿using BookManager.FileProcessing;
 using System.Text;
 
-namespace BookManager.Utils
+namespace BookManager.Validators
 {
     public class ParseError
     {
