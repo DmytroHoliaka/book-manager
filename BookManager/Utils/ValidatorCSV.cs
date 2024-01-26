@@ -107,17 +107,33 @@ namespace BookManager.Utils
                 {
                     _errors.Add(new ParseError(lineCount, line, "Incorrect pages count", columnNames[_pagesIndex]));
                 }
-                
+
                 if (IsCorrectDate(columnNames[_dateIndex]) == false)
                 {
                     _errors.Add(new ParseError(lineCount, line, "Incorrect date format", columnNames[_dateIndex]));
                 }
             }
 
+            if (IsFileEndsEmptyLine(reader))
+            {
+                lineCount += 1;
+                _errors.Add(new ParseError(lineCount, string.Empty, "Last line is empty", "All columns"));
+            }
+
             if (_errors.Any())
             {
                 throw new InvalidOperationException(ParseError.GetErrors(_errors));
             }
+        }
+
+        private static bool IsFileEndsEmptyLine(StreamReader reader)
+        {
+            reader.BaseStream.Seek(-1, SeekOrigin.End);
+
+            int newLineCharCode = 10;
+            int lastCharCode = reader.Read();
+
+            return lastCharCode == newLineCharCode;
         }
 
         private static bool IsCorrectDate(string dateLine)
