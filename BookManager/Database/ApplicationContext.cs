@@ -23,10 +23,6 @@ namespace BookManager.Database
             }
 
             Config = config;
-
-            // ToDo: Remove
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
