@@ -1,5 +1,4 @@
-﻿using BookManager.FileProcessing;
-using System.Text;
+﻿using System.Text;
 
 namespace BookManager.Validators
 {
@@ -28,11 +27,7 @@ namespace BookManager.Validators
 
         public override string ToString()
         {
-            const int lineWidth = 4;
-            const int contentWidth = 100;
-            const int textWidth = 40;
-
-            return $"Line: {_line, -lineWidth} ({_content, -contentWidth}) \t {_text, -textWidth} ({_value})";
+            return $"Line: {_line}  ({_content})  {_text} ({_value})";
         }
 
         public static string GetErrors(List<ParseError> errors)
