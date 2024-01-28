@@ -2,21 +2,20 @@
 
 namespace BookManager.Validators
 {
-    // ToDo: Add emply column validators
     public class ValidatorCSV : IFileValidator
     {
         public IEnumerable<ParseError> Errors =>
             _errors.Select(err => new ParseError(err));
 
         private readonly List<ParseError> _errors;
+        private readonly List<ColumnName> _columnOrder;
         private const int _columnCount = 6;
-        private int _pagesIndex;
-        private int _dateIndex;
 
 
         public ValidatorCSV()
         {
             _errors = [];
+            _columnOrder = [];
         }
 
         public void Validate(string pathCSV)
@@ -26,10 +25,11 @@ namespace BookManager.Validators
             using StreamReader reader = new(pathCSV);
             string[] columnNames = ValidateHeader(reader);
 
-            InitializeIndexes(columnNames);
+            InitializeColumnOrder(columnNames);
 
             ValidateContent(reader);
         }
+
 
         private static void ValidateExtention(string path, string extention)
         {
@@ -41,9 +41,43 @@ namespace BookManager.Validators
             }
         }
 
+        private static bool IsCorrectName(string columnName)
+        {
+            return string.IsNullOrWhiteSpace(columnName) == false;
+        }
+
+        private static bool IsFileEndsEmptyLine(StreamReader reader)
+        {
+            reader.BaseStream.Seek(-1, SeekOrigin.End);
+
+            int newLineCharCode = 10;
+            int lastCharCode = reader.Read();
+
+            return lastCharCode == newLineCharCode;
+        }
+
+        private static bool IsCorrectDate(string dateLine)
+        {
+            return dateLine == string.Empty || DateTime.TryParse(dateLine, out DateTime _);
+        }
+
+        private static bool IsCorrectPages(string pagesLine)
+        {
+            bool check = int.TryParse(pagesLine, out int pages);
+
+            if (check == false || pages <= 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
         private string[] ValidateHeader(StreamReader reader)
         {
             string? header = reader.ReadLine();
+            int lineCount = 1;
 
             if (header is null)
             {
@@ -57,11 +91,16 @@ namespace BookManager.Validators
                 throw new ArgumentOutOfRangeException(nameof(columnNames), "Incorrect count of columns");
             }
 
+            if (columnNames.Distinct().Count() != columnNames.Length)
+            {
+                throw new InvalidDataException("Header have duplicate names");
+            }
+
             foreach (string columnName in columnNames)
             {
                 if (Enum.IsDefined(typeof(ColumnName), columnName) == false)
                 {
-                    _errors.Add(new ParseError(1, header, $"Incorrect column name", columnName));
+                    _errors.Add(new ParseError(lineCount, header, $"Incorrect column name", columnName));
                 }
             }
 
@@ -73,18 +112,11 @@ namespace BookManager.Validators
             return columnNames;
         }
 
-        private void InitializeIndexes(string[] columnNames)
+        private void InitializeColumnOrder(string[] columnNames)
         {
             for (int i = 0; i < columnNames.Length; ++i)
             {
-                if ((ColumnName)Enum.Parse(typeof(ColumnName), columnNames[i]) == ColumnName.Pages)
-                {
-                    _pagesIndex = i;
-                }
-                else if ((ColumnName)Enum.Parse(typeof(ColumnName), columnNames[i]) == ColumnName.ReleaseDate)
-                {
-                    _dateIndex = i;
-                }
+                _columnOrder.Add((ColumnName)Enum.Parse(typeof(ColumnName), columnNames[i]));
             }
         }
 
@@ -104,15 +136,7 @@ namespace BookManager.Validators
                     continue;
                 }
 
-                if (IsCorrectPages(columnNames[_pagesIndex]) == false)
-                {
-                    _errors.Add(new ParseError(lineCount, line, "Incorrect pages count", columnNames[_pagesIndex]));
-                }
-
-                if (IsCorrectDate(columnNames[_dateIndex]) == false)
-                {
-                    _errors.Add(new ParseError(lineCount, line, "Incorrect date format", columnNames[_dateIndex]));
-                }
+                ValidateColumns(columnNames, line, lineCount);
             }
 
             if (IsFileEndsEmptyLine(reader))
@@ -127,31 +151,49 @@ namespace BookManager.Validators
             }
         }
 
-        private static bool IsFileEndsEmptyLine(StreamReader reader)
+        private void ValidateColumns(string[] columns, string line, int lineCount)
         {
-            reader.BaseStream.Seek(-1, SeekOrigin.End);
-
-            int newLineCharCode = 10;
-            int lastCharCode = reader.Read();
-
-            return lastCharCode == newLineCharCode;
-        }
-
-        private static bool IsCorrectDate(string dateLine)
-        {
-            return DateTime.TryParse(dateLine, out DateTime _);
-        }
-
-        private static bool IsCorrectPages(string pagesLine)
-        {
-            bool check = int.TryParse(pagesLine, out int pages);
-
-            if (check == false || pages <= 0)
+            for (int i = 0; i < _columnOrder.Count; ++i)
             {
-                return false;
-            }
+                switch (_columnOrder[i])
+                {
+                    case ColumnName.Pages:
 
-            return true;
+                        if (IsCorrectPages(columns[i]) == false)
+                        {
+                            _errors.Add(new ParseError(lineCount, line, "Incorrect pages count", columns[i]));
+                        }
+
+                        break;
+
+
+                    case ColumnName.ReleaseDate:
+
+                        if (IsCorrectDate(columns[i]) == false)
+                        {
+                            _errors.Add(new ParseError(lineCount, line, "Incorrect date format", columns[i]));
+                        }
+
+                        break;
+
+
+                    case ColumnName.Title:
+                    case ColumnName.Genre:
+                    case ColumnName.Author:
+                    case ColumnName.Publisher:
+
+                        if (IsCorrectName(columns[i]) == false)
+                        {
+                            _errors.Add(new ParseError(lineCount, line, $"Incorrect {_columnOrder[i]}", columns[i]));
+                        }
+
+                        break;
+
+
+                    default:
+                        throw new InvalidDataException("Incorrect column name");
+                }
+            }
         }
     }
 }
