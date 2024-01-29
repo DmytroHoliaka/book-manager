@@ -4,14 +4,14 @@ namespace BookManager.Execution
 {
     public class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
             try
             {
                 ConsoleDataHandler data = new();
                 string? path = data.GetPath();
 
-                Facade.Execute(path);
+                await Facade.Execute(path);
             }
             catch (InvalidOperationException ex)
             {
