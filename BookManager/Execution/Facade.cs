@@ -1,5 +1,6 @@
 ﻿using BookManager.Configuration;
 using BookManager.Database;
+using BookManager.Entities;
 using BookManager.FileProcessing;
 using BookManager.Filtering;
 using BookManager.Validators;
@@ -9,7 +10,7 @@ namespace BookManager.Execution
 {
     public class Facade
     {
-        public static void Execute(string? path)
+        public static async Task Execute(string? path)
         {
             ValidatorInputData.ValidateFilePath(path);
 
@@ -17,23 +18,29 @@ namespace BookManager.Execution
             string sectionName = "Filters";
             string pathCSV = OutputDispatcher.GetOutputFileName();
 
-            IConfigurator configManager = new ConfiguratorJson(jsonName);
+            ConfiguratorJson configManager = new(jsonName);
+            configManager!.TrimSectionValues(sectionName);
+
             IConfiguration config = configManager.Config;
+            List<ColumnName>? columnOrder;
 
-            using (ApplicationContext context = new(config))
-            {
-                IDatabaseManager databaseManager = new DatabaseManager(context);
+            
+            using ApplicationContext context = new(config);
 
-                IFileParser parser = new FileParserCSV(databaseManager);
-                parser.Parse(path!);
+            IDatabaseManager databaseManager = new DatabaseManager(context);
 
-                Filter filter = configManager.GetFilter(sectionName);
-                Searcher searcher = new(filter, context);
+            FileParserCSV parser = new(databaseManager);
+            await parser.ParseAsync(path!);
+            columnOrder = parser.FileColumnOrder;
 
-                OutputDispatcher outputer = new(searcher.FillteredBook, (parser as FileParserCSV)?.FileColumnOrder);
-                outputer.OutputToConsole();
-                outputer.OutputToCSV(pathCSV);
-            }
+            Filter filter = configManager.GetFilter(sectionName);
+            Searcher searcher = new(context);
+            List<Book> filteredBooks = await searcher.GetFilteredBooks(filter);
+
+            OutputDispatcher outputer = new(filteredBooks, columnOrder);
+            outputer.OutputToConsole();
+            outputer.OutputToCSV(pathCSV);
+
         }
     }
 }
