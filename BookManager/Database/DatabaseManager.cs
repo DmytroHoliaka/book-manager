@@ -1,4 +1,5 @@
 ﻿using BookManager.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookManager.Database
 {
@@ -16,10 +17,14 @@ namespace BookManager.Database
             _db = db;
         }
 
-
-        public int InsertAuthor(string authorName)
+        public async Task<Guid> InsertAuthorAsync(string authorName)
         {
-            Author? duplicate = _db.Authors.FirstOrDefault(a => a.Name == authorName);
+            if (await _db.Database.CanConnectAsync() == false)
+            {
+                throw new InvalidOperationException("Cannot get access to database");
+            }
+
+            Author? duplicate = await _db.Authors.FirstOrDefaultAsync(a => a.Name == authorName);
 
             if (duplicate is not null)
             {
@@ -31,15 +36,20 @@ namespace BookManager.Database
                 Name = authorName,
             };
 
-            _db.Authors.Add(author);
-            _db.SaveChanges();
+            await _db.Authors.AddAsync(author);
+            await _db.SaveChangesAsync();
 
             return author.Id;
         }
 
-        public int InsertGenre(string genreName)
+        public async Task<Guid> InsertGenreAsync(string genreName)
         {
-            Genre? duplicate = _db.Genres.FirstOrDefault(d => d.Name == genreName);
+            if (await _db.Database.CanConnectAsync() == false)
+            {
+                throw new InvalidOperationException("Cannot get access to database");
+            }
+
+            Genre? duplicate = await _db.Genres.FirstOrDefaultAsync(d => d.Name == genreName);
 
             if (duplicate is not null)
             {
@@ -51,15 +61,20 @@ namespace BookManager.Database
                 Name = genreName,
             };
 
-            _db.Genres.Add(genre);
-            _db.SaveChanges();
+            await _db.Genres.AddAsync(genre);
+            await _db.SaveChangesAsync();
 
             return genre.Id;
         }
 
-        public int InsertPublisher(string publisherName)
+        public async Task<Guid> InsertPublisherAsync(string publisherName)
         {
-            Publisher? duplicate = _db.Publishers.FirstOrDefault(p => p.Name == publisherName);
+            if (await _db.Database.CanConnectAsync() == false)
+            {
+                throw new InvalidOperationException("Cannot get access to database");
+            }
+
+            Publisher? duplicate = await _db.Publishers.FirstOrDefaultAsync(p => p.Name == publisherName);
 
             if (duplicate is not null)
             {
@@ -71,20 +86,25 @@ namespace BookManager.Database
                 Name = publisherName,
             };
 
-            _db.Publishers.Add(publisher);
-            _db.SaveChanges();
+            await _db.Publishers.AddAsync(publisher);
+            await _db.SaveChangesAsync();
 
             return publisher.Id;
         }
 
-        public int InsertBook(string title, int pages, DateTime? releaseDate, int genreId, int? authorId, int? publisherId)
+        public async Task<Guid> InsertBookAsync(string title, int pages, DateTime? releaseDate, Guid genreId, Guid? authorId, Guid? publisherId)
         {
-            Book? duplicate = _db.Books.FirstOrDefault(b => b.Title == title &&
-                                                            b.Pages == pages &&
-                                                            b.ReleaseDate == releaseDate &&
-                                                            b.GenreId == genreId &&
-                                                            b.AuthorId == authorId &&
-                                                            b.PublisherId == publisherId);
+            if (await _db.Database.CanConnectAsync() == false)
+            {
+                throw new InvalidOperationException("Cannot get access to database");
+            }
+
+            Book? duplicate = await _db.Books.FirstOrDefaultAsync(b => b.Title == title &&
+                                                                       b.Pages == pages &&
+                                                                       b.ReleaseDate == releaseDate &&
+                                                                       b.GenreId == genreId &&
+                                                                       b.AuthorId == authorId &&
+                                                                       b.PublisherId == publisherId);
 
             if (duplicate is not null)
             {
@@ -101,8 +121,8 @@ namespace BookManager.Database
                 PublisherId = publisherId,
             };
 
-            _db.Books.Add(book);
-            _db.SaveChanges();
+            await _db.Books.AddAsync(book);
+            await _db.SaveChangesAsync();
 
             return book.Id;
         }

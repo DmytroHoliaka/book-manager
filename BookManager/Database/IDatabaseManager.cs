@@ -2,9 +2,9 @@
 {
     public interface IDatabaseManager
     {
-        int InsertAuthor(string authorName);
-        int InsertGenre(string genreName);
-        int InsertPublisher(string publisherName);
-        int InsertBook(string title, int pages, DateTime? releaseDate, int genre, int? author, int? publisher);
+        Task<Guid> InsertAuthorAsync(string authorName);
+        Task<Guid> InsertGenreAsync(string genreName);
+        Task<Guid> InsertPublisherAsync(string publisherName);
+        Task<Guid> InsertBookAsync(string title, int pages, DateTime? releaseDate, Guid genre, Guid? author, Guid? publisher);
     }
 }
