@@ -40,12 +40,12 @@ namespace BookManager.Filtering
             using StreamWriter writer = new(pathCSV);
 
             writer.WriteLine(string.Join(',', _columnOrder));
-            
+
             foreach (Book book in _books)
             {
                 outputDate[ColumnName.Title] = book.Title!;
                 outputDate[ColumnName.Pages] = book.Pages.ToString();
-                outputDate[ColumnName.Genre] = book.Genre!.Name!;
+                outputDate[ColumnName.Genre] = book.Genre?.Name!;
                 outputDate[ColumnName.ReleaseDate] = book.ReleaseDate?.ToString("yyyy-MM-dd");
                 outputDate[ColumnName.Author] = book.Author?.Name;
                 outputDate[ColumnName.Publisher] = book.Publisher?.Name;
