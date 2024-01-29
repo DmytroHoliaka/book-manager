@@ -1,51 +1,83 @@
 ﻿using BookManager.Database;
 using BookManager.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace BookManager.Filtering
 {
     public class Searcher
     {
-        public IEnumerable<Book>? FillteredBook
-            => _fillteredBook?.Select(book => new Book(book));
-
-        private IEnumerable<Book>? _fillteredBook;
-        private readonly Filter _filter;
         private readonly ApplicationContext _db;
 
-        public Searcher(Filter? filter, ApplicationContext db)
+        public Searcher(ApplicationContext db)
         {
-            if (filter is null)
-            {
-                throw new ArgumentNullException(nameof(filter), "Filter cannot be null");
-            }
-
             if (db is null)
             {
                 throw new ArgumentNullException(nameof(db), "Application context cannot be null");
             }
 
-            _filter = filter;
             _db = db;
-
-            Initialize();
         }
 
-        private void Initialize()
+        public Task<List<Book>> GetFilteredBooks(Filter? filter)
         {
-            _fillteredBook = _db.Books
-                                    .Include(b => b.Genre)
-                                    .Include(b => b.Author)
-                                    .Include(b => b.Publisher)
-                                    .Where(b => (_filter.Title == string.Empty || b.Title == _filter.Title) &&
-                                                (_filter.Genre == string.Empty || b.Genre!.Name == _filter.Genre) &&
-                                                (_filter.Author == string.Empty || (b.Author != null && b.Author.Name == _filter.Author)) &&
-                                                (_filter.Publisher == string.Empty || (b.Publisher != null && b.Publisher.Name == _filter.Publisher)) &&
-                                                (_filter.MoreThanPages == null || b.Pages > _filter.MoreThanPages) &&
-                                                (_filter.LessThanPages == null || b.Pages < _filter.LessThanPages) &&
-                                                (_filter.PublishedBefore == null || b.ReleaseDate < _filter.PublishedBefore) &&
-                                                (_filter.PublishedAfter == null || b.ReleaseDate > _filter.PublishedAfter)
-                                           );
+            // ToDo: Add database assecciblity
+            if (_db.Database.CanConnect() == false)
+            {
+                throw new InvalidOperationException("Cannot get access to database");
+            }
+
+            if (filter is null)
+            {
+                throw new ArgumentNullException(nameof(filter), "Filter cannot be null");
+            }
+
+            IQueryable<Book> filteredBooks = _db.Books
+                                                    .Include(b => b.Genre)
+                                                    .Include(b => b.Author)
+                                                    .Include(b => b.Publisher);
+
+            if (string.IsNullOrWhiteSpace(filter.Title) == false)
+            {
+                filteredBooks = filteredBooks.Where(b => b.Title == filter.Title);
+            }
+
+            if (string.IsNullOrWhiteSpace(filter.Genre) == false)
+            {
+                filteredBooks = filteredBooks.Where(b => b.Genre!.Name == filter.Genre);
+            }
+
+            if (string.IsNullOrWhiteSpace(filter.Author) == false)
+            {
+                filteredBooks = filteredBooks.Where(b => b.Author!.Name == filter.Author);
+            }
+
+            if (string.IsNullOrWhiteSpace(filter.Publisher) == false)
+            {
+                filteredBooks = filteredBooks.Where(b => b.Publisher!.Name == filter.Publisher);
+            }
+
+            if (filter.MoreThanPages != null)
+            {
+                filteredBooks = filteredBooks.Where(b => b.Pages > filter.MoreThanPages);
+            }
+
+            if (filter.LessThanPages != null)
+            {
+                filteredBooks = filteredBooks.Where(b => b.Pages < filter.LessThanPages);
+            }
+
+            if (filter.PublishedBefore != null)
+            {
+                filteredBooks = filteredBooks.Where(b => b.ReleaseDate < filter.PublishedBefore);
+            }
+
+            if (filter.PublishedAfter != null)
+            {
+                filteredBooks = filteredBooks.Where(b => b.ReleaseDate > filter.PublishedAfter);
+            }
+
+            return filteredBooks.ToListAsync();
         }
     }
 }
