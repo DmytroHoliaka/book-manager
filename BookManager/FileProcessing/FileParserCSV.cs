@@ -4,7 +4,7 @@ using BookManager.Validators;
 namespace BookManager.FileProcessing
 {
     public class FileParserCSV : IFileParser
-    {
+    {   
         public IDatabaseManager DatabaseManager { get; }
         public List<ColumnName> FileColumnOrder =>
             _fileColumnOrder.ConvertAll(name => name);
@@ -17,14 +17,14 @@ namespace BookManager.FileProcessing
             _fileColumnOrder = [];
         }
 
-        public void Parse(string pathCSV)
+        public async Task ParseAsync(string pathCSV)
         {
             ValidatorCSV validator = new();
             validator.Validate(pathCSV);
 
             using StreamReader reader = new(pathCSV);
             ProcessHeaderCSV(reader);
-            FillDatabase(reader);
+            await FillDatabase(reader);
         }
 
         private void ProcessHeaderCSV(StreamReader reader)
@@ -39,7 +39,7 @@ namespace BookManager.FileProcessing
             }
         }
 
-        private void FillDatabase(StreamReader reader)
+        private async Task FillDatabase(StreamReader reader)
         {
             string? line;
 
@@ -47,42 +47,42 @@ namespace BookManager.FileProcessing
             {
                 string[] columnNames = line.Split(',');
 
-                int genreId = ProcessGenre(columnNames);
-                int authorId = ProcessAuthor(columnNames);
-                int publisherId = ProcessPublisher(columnNames);
+                Guid genreId = await ProcessGenreAsync(columnNames);
+                Guid authorId = await ProcessAuthorAsync(columnNames);
+                Guid publisherId = await ProcessPublisherAsync(columnNames);
 
-                ProcessBook(columnNames, genreId, authorId, publisherId);
+                await ProcessBook(columnNames, genreId, authorId, publisherId);
             }
         }
 
-        private int ProcessGenre(string[] columns)
+        private async Task<Guid> ProcessGenreAsync(string[] columns)
         {
             int index = _fileColumnOrder.IndexOf(ColumnName.Genre);
             string genreName = columns[index];
 
-            int genreId = DatabaseManager.InsertGenre(genreName);
+            Guid genreId = await DatabaseManager.InsertGenreAsync(genreName);
             return genreId;
         }
 
-        private int ProcessAuthor(string[] columns)
+        private async Task<Guid> ProcessAuthorAsync(string[] columns)
         {
             int index = _fileColumnOrder.IndexOf(ColumnName.Author);
             string authorName = columns[index];
 
-            int authorId = DatabaseManager.InsertAuthor(authorName);
+            Guid authorId = await DatabaseManager.InsertAuthorAsync(authorName);
             return authorId;
         }
 
-        private int ProcessPublisher(string[] columns)
+        private async Task<Guid> ProcessPublisherAsync(string[] columns)
         {
             int index = _fileColumnOrder.IndexOf(ColumnName.Publisher);
             string publisherName = columns[index];
 
-            int publisherId = DatabaseManager.InsertPublisher(publisherName);
+            Guid publisherId = await DatabaseManager.InsertPublisherAsync(publisherName);
             return publisherId;
         }
 
-        private void ProcessBook(string[] columns, int genreId, int? authorId, int? publisherId)
+        private async Task ProcessBook(string[] columns, Guid genreId, Guid? authorId, Guid? publisherId)
         {
             int indexTitle = _fileColumnOrder.IndexOf(ColumnName.Title);
             int indexPages = _fileColumnOrder.IndexOf(ColumnName.Pages);
@@ -94,7 +94,7 @@ namespace BookManager.FileProcessing
             string? releaseDateStr = columns[indexReleaseDate] == string.Empty ? null : columns[indexReleaseDate];
             DateTime? releaseDate = releaseDateStr is null ? null : Convert.ToDateTime(releaseDateStr);
 
-            DatabaseManager.InsertBook(title, Convert.ToInt32(pages), releaseDate, genreId, authorId, publisherId);
+            await DatabaseManager.InsertBookAsync(title, Convert.ToInt32(pages), releaseDate, genreId, authorId, publisherId);
         }
     }
 }

@@ -6,6 +6,6 @@ namespace BookManager.FileProcessing
     {
         IDatabaseManager DatabaseManager { get; }
 
-        void Parse(string pathCSV);
+        Task ParseAsync(string pathCSV);
     }
 }
