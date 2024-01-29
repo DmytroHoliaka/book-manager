@@ -1,5 +1,7 @@
 ﻿using BookManager.Filtering;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BookManager.Configuration
 {
@@ -7,10 +9,10 @@ namespace BookManager.Configuration
     {
         public IConfiguration Config { get; }
 
-        public ConfiguratorJson(string jsonName)
+        public ConfiguratorJson(string jsonName, string subFolder = "Configuration")
         {
             Config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory() + @"\Configuration\")
+                .SetBasePath(@$"{Directory.GetCurrentDirectory()}\{subFolder}")
                 .AddJsonFile(jsonName)
                 .Build();
         }
@@ -22,8 +24,21 @@ namespace BookManager.Configuration
 
         public Filter GetFilter(string sectionName)
         {
-            return Config.GetSection(sectionName).Get<Filter>() ??
-                throw new InvalidDataException("Cannot create filter from json file");
+            return Config.GetSection(sectionName).Get<Filter>()
+                   ?? throw new InvalidDataException("Cannot create filter from file");
+        }
+
+        public void TrimSectionValues(string sectionName)
+        {
+            foreach (IConfigurationSection? section in Config.GetSection(sectionName).GetChildren())
+            {
+                if (section is null)
+                {
+                    continue;
+                }
+
+                section.Value = section.Value?.Trim();
+            }
         }
     }
 }
