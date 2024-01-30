@@ -7,7 +7,7 @@ namespace BookManager.Database
     {
         private readonly ApplicationContext _db;
 
-        public DatabaseManager(ApplicationContext db)
+        public DatabaseManager(ApplicationContext? db)
         {
             if (db is null)
             {
