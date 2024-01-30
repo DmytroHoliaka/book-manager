@@ -8,11 +8,13 @@ namespace BookManager.Tests.UnitTesting.xUnit
     {
         private readonly string _dirName;
         private readonly string _fileName;
+        private readonly string _path;
 
         public ConfiguratorJsonTests()
         {
-            _dirName = @".\ConfiguratorJsonTests";
-            _fileName = @".\Temp.csv";
+            _dirName = "ConfiguratorJsonTests";
+            _fileName = "Temp.csv";
+            _path = $@".\{_dirName}\{_fileName}";
 
             Directory.CreateDirectory(_dirName);
         }
@@ -32,7 +34,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
         public void GetFilter_CorrectJsonFile_ReturnsFilterInstance(string section, string content, FilterTemplate template)
         {
             // Arrange
-            WriteIntoFile(content, _fileName);
+            File.WriteAllText(_path, content);
             ConfiguratorJson config = new(_fileName, _dirName);
 
             // Act
@@ -47,7 +49,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
         public void GetFilter_IncorrectJsonFile_ThrowsInvalidOperationException(string section, string content)
         {
             // Arrange
-            WriteIntoFile(content, _fileName);
+            File.WriteAllText(_path, content);
             ConfiguratorJson config = new(_fileName, _dirName);
 
             // Act & Assert
@@ -59,7 +61,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
         public void GetFilter_IncorrectJsonFile_ThrowsInvalidDataException(string section, string content)
         {
             // Arrange
-            WriteIntoFile(content, _fileName);
+            File.WriteAllText(_path, content);
             ConfiguratorJson config = new(_fileName, _dirName);
 
             // Act & Assert
