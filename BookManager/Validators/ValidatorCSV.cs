@@ -1,4 +1,5 @@
 ﻿using BookManager.FileProcessing;
+using System.Net.Http.Headers;
 
 namespace BookManager.Validators
 {
@@ -18,11 +19,11 @@ namespace BookManager.Validators
             _columnOrder = [];
         }
 
-        public void Validate(string pathCSV)
+        public void Validate(string? pathCSV)
         {
-            ValidateExtention(pathCSV, ".csv");
+            ValidatePath(pathCSV);
 
-            using StreamReader reader = new(pathCSV);
+            using StreamReader reader = new(pathCSV!);
             string[] columnNames = ValidateHeader(reader);
 
             InitializeColumnOrder(columnNames);
@@ -30,6 +31,20 @@ namespace BookManager.Validators
             ValidateContent(reader);
         }
 
+        private static void ValidatePath(string? path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException(nameof(path), "Path to CSV are incorrect");
+            }
+
+            ValidateExtention(path, ".csv");
+
+            if (File.Exists(path) == false)
+            {
+                throw new FileNotFoundException("File doesn't exists", nameof(path));
+            }
+        }
 
         private static void ValidateExtention(string path, string extention)
         {
