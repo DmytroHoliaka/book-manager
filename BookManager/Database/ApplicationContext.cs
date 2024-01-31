@@ -1,7 +1,7 @@
 ﻿using BookManager.Entities;
-using BookManager.Filtering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BookManager.Database
 {
@@ -13,7 +13,6 @@ namespace BookManager.Database
         public DbSet<Book> Books => Set<Book>();
 
         public IConfiguration Config { get; set; }
-
 
         public ApplicationContext(IConfiguration? config)
         {

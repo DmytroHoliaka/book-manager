@@ -1,7 +1,6 @@
 ﻿using BookManager.Database;
 using BookManager.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BookManager.Filtering
 {
@@ -21,7 +20,6 @@ namespace BookManager.Filtering
 
         public Task<List<Book>> GetFilteredBooks(Filter? filter)
         {
-            // ToDo: Add database assecciblity
             if (_db.Database.CanConnect() == false)
             {
                 throw new InvalidOperationException("Cannot get access to database");

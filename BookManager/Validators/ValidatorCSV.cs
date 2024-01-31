@@ -1,5 +1,4 @@
 ﻿using BookManager.FileProcessing;
-using System.Net.Http.Headers;
 
 namespace BookManager.Validators
 {

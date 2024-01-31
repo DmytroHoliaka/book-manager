@@ -16,7 +16,8 @@ namespace BookManager.Execution
 
             string jsonName = "appSettings.json";
             string sectionName = "Filters";
-            string pathCSV = OutputDispatcher.GetOutputFileName();
+            string pathCSV = OutputDispatcher.GetOutputFileName(new SystemTimeProvider());
+            OutputDispatcher.EnsureDirectoryCreated(pathCSV);
 
             ConfiguratorJson configManager = new(jsonName);
             configManager!.TrimSectionValues(sectionName);
