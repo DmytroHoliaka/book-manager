@@ -1,5 +1,4 @@
 using BookManager.Configuration;
-using BookManager.Entities;
 using BookManager.Filtering;
 
 namespace BookManager.Tests.UnitTesting.xUnit
