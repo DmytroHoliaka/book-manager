@@ -70,11 +70,20 @@ namespace BookManager.Filtering
             }
         }
 
-        public static string GetOutputFileName()
+        public static string GetOutputFileName(ITimeProvider time)
         {
-            string pathCSV = $"../../../../Outputs/output ({DateTime.Now:yyyy.MM.dd HH-mm-ss.ffff}).csv";
+            string pathCSV = $"../../../../Outputs/output ({time.Now:yyyy.MM.dd HH-mm-ss.ffff}).csv";
+            return pathCSV;
+        }
 
-            FileInfo file = new(pathCSV);
+        public static void EnsureDirectoryCreated(string? filePath)
+        {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath), "File path cannot be null");
+            }
+
+            FileInfo file = new(filePath);
             DirectoryInfo? dir = file.Directory;
 
             if (dir is null)
@@ -86,8 +95,6 @@ namespace BookManager.Filtering
             {
                 dir.Create();
             }
-
-            return pathCSV;
         }
     }
 }
