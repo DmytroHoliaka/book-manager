@@ -1,6 +1,5 @@
 ﻿using BookManager.Database;
 using BookManager.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace BookManager.Tests.UnitTesting.xUnit
@@ -12,14 +11,14 @@ namespace BookManager.Tests.UnitTesting.xUnit
 
         public DatabaseManagerTests()
         {
-            Dictionary<string, string> connection = new()
+            Dictionary<string, string?>? connection = new()
             {
                 { "ConnectionStrings:Default",
                  @"Server=(localdb)\mssqllocaldb;Database=DatabaseManagerTests;Trusted_Connection=True;" }
             };
 
             IConfiguration config = new ConfigurationBuilder()
-                                        .AddInMemoryCollection(connection!) // ToDo: Learn
+                                        .AddInMemoryCollection(connection)
                                         .Build();
             _db = new(config);
             _dm = new(_db);
