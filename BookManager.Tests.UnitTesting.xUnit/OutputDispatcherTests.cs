@@ -76,28 +76,26 @@ namespace BookManager.Tests.UnitTesting.xUnit
             IEnumerable<Book> books3 = [hobit, animalFarm];
 
             string expected1 =
-                """
-                    Total count: 0
-
-
-                    """;
+                "Total count: 0" +
+                Environment.NewLine +
+                Environment.NewLine;
 
             string expected2 =
-                """
-                    Total count: 1
-
-                    The Hobbit
-
-                    """;
+                "Total count: 1" +
+                Environment.NewLine +
+                Environment.NewLine +
+                "The Hobbit" +
+                Environment.NewLine;
 
             string expected3 =
-                """
-                    Total count: 2
+                "Total count: 2" +
+                Environment.NewLine +
+                Environment.NewLine +
+                "The Hobbit" +
+                Environment.NewLine +
+                "Animal Farm" +
+                Environment.NewLine;
 
-                    The Hobbit
-                    Animal Farm
-
-                    """;
 
             List<ColumnName> order =
             [
@@ -236,46 +234,40 @@ namespace BookManager.Tests.UnitTesting.xUnit
 
 
             string expected11 =
-                """
-                Title,Pages,Genre,ReleaseDate,Author,Publisher
-
-                """;
+                "Title,Pages,Genre,ReleaseDate,Author,Publisher" +
+                Environment.NewLine;
 
             string expected12 =
-               """
-                Pages,Title,Author,ReleaseDate,Genre,Publisher
-
-                """;
+                "Pages,Title,Author,ReleaseDate,Genre,Publisher" +
+                Environment.NewLine;
 
             string expected21 =
-                """
-                Title,Pages,Genre,ReleaseDate,Author,Publisher
-                The Hobbit,176,Fantasy,1947-02-01,Alex,Scholastic
-                
-                """;
+                "Title,Pages,Genre,ReleaseDate,Author,Publisher" +
+                Environment.NewLine +
+                "The Hobbit,176,Fantasy,1947-02-01,Alex,Scholastic" +
+                Environment.NewLine;
 
             string expected22 =
-                """
-                Pages,Title,Author,ReleaseDate,Genre,Publisher
-                176,The Hobbit,Alex,1947-02-01,Fantasy,Scholastic
-
-                """;
+                "Pages,Title,Author,ReleaseDate,Genre,Publisher" +
+                Environment.NewLine +
+                "176,The Hobbit,Alex,1947-02-01,Fantasy,Scholastic" +
+                Environment.NewLine;
 
             string expected31 =
-                """
-                Title,Pages,Genre,ReleaseDate,Author,Publisher
-                The Hobbit,176,Fantasy,1947-02-01,Alex,Scholastic
-                Animal Farm,324,Fantasy,1995-05-06,Alex,Scholastic
-
-                """;
+                "Title,Pages,Genre,ReleaseDate,Author,Publisher" +
+                Environment.NewLine +
+                "The Hobbit,176,Fantasy,1947-02-01,Alex,Scholastic" +
+                Environment.NewLine +
+                "Animal Farm,324,Fantasy,1995-05-06,Alex,Scholastic" +
+                Environment.NewLine;
 
             string expected32 =
-                """
-                Pages,Title,Author,ReleaseDate,Genre,Publisher
-                176,The Hobbit,Alex,1947-02-01,Fantasy,Scholastic
-                324,Animal Farm,Alex,1995-05-06,Fantasy,Scholastic
-
-                """;
+                "Pages,Title,Author,ReleaseDate,Genre,Publisher" +
+                Environment.NewLine +
+                "176,The Hobbit,Alex,1947-02-01,Fantasy,Scholastic" +
+                Environment.NewLine +
+                "324,Animal Farm,Alex,1995-05-06,Fantasy,Scholastic" +
+                Environment.NewLine;
 
             return new List<object[]>()
             {
@@ -297,7 +289,10 @@ namespace BookManager.Tests.UnitTesting.xUnit
             // Arrange
             Mock<ITimeProvider> mock = new();
             mock.Setup(d => d.Now).Returns(new DateTime(2020, 12, 30, 18, 30, 55, 175));
-            string expected = $"../../../../Outputs/output (2020.12.30 18-30-55.1750).csv";
+
+            DirectoryInfo dir = new(AppDomain.CurrentDomain.BaseDirectory);
+            string dirPath = dir.Parent!.Parent!.Parent!.Parent!.FullName;
+            string expected = $"{dirPath}/Outputs/output (2020.12.30 18-30-55.1750).csv";
 
             // Act
             string actual = OutputDispatcher.GetOutputFileName(mock.Object);

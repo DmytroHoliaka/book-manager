@@ -72,7 +72,11 @@ namespace BookManager.Filtering
 
         public static string GetOutputFileName(ITimeProvider time)
         {
-            string pathCSV = $"../../../../Outputs/output ({time.Now:yyyy.MM.dd HH-mm-ss.ffff}).csv";
+            DirectoryInfo dir = new(AppDomain.CurrentDomain.BaseDirectory);
+            string dirPath = dir.Parent?.Parent?.Parent?.Parent?.FullName
+                ?? throw new InvalidOperationException("Cannot create output folder");
+
+            string pathCSV = $"{dirPath}/Outputs/output ({time.Now:yyyy.MM.dd HH-mm-ss.ffff}).csv";
             return pathCSV;
         }
 
