@@ -289,7 +289,10 @@ namespace BookManager.Tests.UnitTesting.xUnit
             // Arrange
             Mock<ITimeProvider> mock = new();
             mock.Setup(d => d.Now).Returns(new DateTime(2020, 12, 30, 18, 30, 55, 175));
-            string expected = $"../../../../Outputs/output (2020.12.30 18-30-55.1750).csv";
+
+            DirectoryInfo dir = new(AppDomain.CurrentDomain.BaseDirectory);
+            string dirPath = dir.Parent!.Parent!.Parent!.Parent!.FullName;
+            string expected = $"{dirPath}/Outputs/output (2020.12.30 18-30-55.1750).csv";
 
             // Act
             string actual = OutputDispatcher.GetOutputFileName(mock.Object);
