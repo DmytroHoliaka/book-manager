@@ -17,7 +17,7 @@ namespace BookManager.Database
             _db = db;
         }
 
-        public async Task<Guid> InsertAuthorAsync(string authorName)
+        public async Task<Guid> EnsureInsertedAuthorAsync(string authorName)
         {
             if (await _db.Database.CanConnectAsync() == false)
             {
@@ -42,7 +42,7 @@ namespace BookManager.Database
             return author.Id;
         }
 
-        public async Task<Guid> InsertGenreAsync(string genreName)
+        public async Task<Guid> EnsureInsertedGenreAsync(string genreName)
         {
             if (await _db.Database.CanConnectAsync() == false)
             {
@@ -67,7 +67,7 @@ namespace BookManager.Database
             return genre.Id;
         }
 
-        public async Task<Guid> InsertPublisherAsync(string publisherName)
+        public async Task<Guid> EnsureInsertedPublisherAsync(string publisherName)
         {
             if (await _db.Database.CanConnectAsync() == false)
             {
@@ -92,7 +92,7 @@ namespace BookManager.Database
             return publisher.Id;
         }
 
-        public async Task<Guid> InsertBookAsync(string title, int pages, DateTime? releaseDate, Guid genreId, Guid? authorId, Guid? publisherId)
+        public async Task<Guid> EnsureInsertedBookAsync(string title, int pages, DateTime? releaseDate, Guid genreId, Guid? authorId, Guid? publisherId)
         {
             if (await _db.Database.CanConnectAsync() == false)
             {

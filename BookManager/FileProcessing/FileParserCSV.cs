@@ -60,7 +60,7 @@ namespace BookManager.FileProcessing
             int index = _fileColumnOrder.IndexOf(ColumnName.Genre);
             string genreName = columns[index];
 
-            Guid genreId = await DatabaseManager.InsertGenreAsync(genreName);
+            Guid genreId = await DatabaseManager.EnsureInsertedGenreAsync(genreName);
             return genreId;
         }
 
@@ -69,7 +69,7 @@ namespace BookManager.FileProcessing
             int index = _fileColumnOrder.IndexOf(ColumnName.Author);
             string authorName = columns[index];
 
-            Guid authorId = await DatabaseManager.InsertAuthorAsync(authorName);
+            Guid authorId = await DatabaseManager.EnsureInsertedAuthorAsync(authorName);
             return authorId;
         }
 
@@ -78,7 +78,7 @@ namespace BookManager.FileProcessing
             int index = _fileColumnOrder.IndexOf(ColumnName.Publisher);
             string publisherName = columns[index];
 
-            Guid publisherId = await DatabaseManager.InsertPublisherAsync(publisherName);
+            Guid publisherId = await DatabaseManager.EnsureInsertedPublisherAsync(publisherName);
             return publisherId;
         }
 
@@ -94,7 +94,7 @@ namespace BookManager.FileProcessing
             string? releaseDateStr = columns[indexReleaseDate] == string.Empty ? null : columns[indexReleaseDate];
             DateTime? releaseDate = releaseDateStr is null ? null : Convert.ToDateTime(releaseDateStr);
 
-            await DatabaseManager.InsertBookAsync(title, Convert.ToInt32(pages), releaseDate, genreId, authorId, publisherId);
+            await DatabaseManager.EnsureInsertedBookAsync(title, Convert.ToInt32(pages), releaseDate, genreId, authorId, publisherId);
         }
     }
 }

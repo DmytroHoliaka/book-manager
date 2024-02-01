@@ -38,20 +38,20 @@ namespace BookManager.Tests.UnitTesting.xUnit
         }
 
         [Fact]
-        public async void InsertAuthorAsync_AuthorName_ReturnsNewAuthor()
+        public async void EnsureInsertedAuthorAsync_AuthorName_ReturnsNewAuthor()
         {
             // Arrange
             string authorName = "Dmytro";
 
             // Act
-            await _dm.InsertAuthorAsync(authorName);
+            await _dm.EnsureInsertedAuthorAsync(authorName);
 
             // Assert
             Assert.True(IsAuthorInserted(authorName));
         }
 
         [Fact]
-        public async void InsertAuthorAsync_DuplicateAuthorName_ReturnsExistingEntry()
+        public async void EnsureInsertedAuthorAsync_DuplicateAuthorName_ReturnsExistingEntry()
         {
             // Arrange
             string duplicateAuthorName = "Alex";
@@ -59,7 +59,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
             int initialCount = 2;
 
             // Act
-            Guid authorId = await _dm.InsertAuthorAsync(duplicateAuthorName);
+            Guid authorId = await _dm.EnsureInsertedAuthorAsync(duplicateAuthorName);
 
             // Assert
             Assert.Equal(initialCount, _db.Authors.ToList().Count);
@@ -67,31 +67,31 @@ namespace BookManager.Tests.UnitTesting.xUnit
         }
 
         [Fact]
-        public async void InsertAuthorAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
+        public async void EnsureInsertedAuthorAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
         {
             // Arrange
             string authorName = "Dmytro";
             _db.Database.EnsureDeleted();
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _dm.InsertAuthorAsync(authorName));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _dm.EnsureInsertedAuthorAsync(authorName));
         }
 
         [Fact]
-        public async void InsertGenreAsync_GenreName_ReturnsNewGenre()
+        public async void EnsureInsertedGenreAsync_GenreName_ReturnsNewGenre()
         {
             // Arrange
             string genreName = "Thriller";
 
             // Act
-            await _dm.InsertGenreAsync(genreName);
+            await _dm.EnsureInsertedGenreAsync(genreName);
 
             // Assert
             Assert.True(IsGenreInserted(genreName));
         }
 
         [Fact]
-        public async void InsertGenreAsync_DuplicateGenreName_ReturnsExistingEntry()
+        public async void EnsureInsertedGenreAsyncc_DuplicateGenreName_ReturnsExistingEntry()
         {
             // Arrange
             string duplicateGenreName = "Fiction";
@@ -99,7 +99,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
             int initialCount = 2;
 
             // Act
-            Guid genreId = await _dm.InsertGenreAsync(duplicateGenreName);
+            Guid genreId = await _dm.EnsureInsertedGenreAsync(duplicateGenreName);
 
             // Assert
             Assert.Equal(initialCount, _db.Genres.ToList().Count);
@@ -107,31 +107,31 @@ namespace BookManager.Tests.UnitTesting.xUnit
         }
 
         [Fact]
-        public async void InsertGenreAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
+        public async void EnsureInsertedGenreAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
         {
             // Arrange
             string genreName = "Thriller";
             _db.Database.EnsureDeleted();
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _dm.InsertGenreAsync(genreName));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _dm.EnsureInsertedGenreAsync(genreName));
         }
 
         [Fact]
-        public async void InsertPublisherAsync_PublisherName_ReturnsNewPublisher()
+        public async void EnsureInsertedPublisherAsync_PublisherName_ReturnsNewPublisher()
         {
             // Arrange
             string publisherName = "The Viking Press";
 
             // Act
-            await _dm.InsertPublisherAsync(publisherName);
+            await _dm.EnsureInsertedPublisherAsync(publisherName);
 
             // Assert
             Assert.True(IsPublisherInserted(publisherName));
         }
 
         [Fact]
-        public async void InsertPublisherAsync_DuplicatePublisherName_ReturnsExistingEntry()
+        public async void EnsureInsertedPublisherAsync_DuplicatePublisherName_ReturnsExistingEntry()
         {
             // Arrange
             string duplicatePublisherName = "HarperCollins";
@@ -139,7 +139,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
             int initialCount = 2;
 
             // Act
-            Guid publisherId = await _dm.InsertPublisherAsync(duplicatePublisherName);
+            Guid publisherId = await _dm.EnsureInsertedPublisherAsync(duplicatePublisherName);
 
             // Assert
             Assert.Equal(initialCount, _db.Publishers.ToList().Count);
@@ -147,19 +147,19 @@ namespace BookManager.Tests.UnitTesting.xUnit
         }
 
         [Fact]
-        public async void InsertPublisherAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
+        public async void EnsureInsertedPublisherAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
         {
             // Arrange
             string publisherName = "HarperCollins";
             _db.Database.EnsureDeleted();
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _dm.InsertPublisherAsync(publisherName));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _dm.EnsureInsertedPublisherAsync(publisherName));
         }
 
 
         [Fact]
-        public async void InsertBookAsync_BookInformation_ReturnsNewBook()
+        public async void EnsureInsertedBookAsync_BookInformation_ReturnsNewBook()
         {
             // Arrange
             Genre genre = _db.Genres.First(g => g.Name == "Fiction");
@@ -172,14 +172,14 @@ namespace BookManager.Tests.UnitTesting.xUnit
             Guid? publisherId = null;
 
             // Act
-            await _dm.InsertBookAsync(title, pages, releaseDate, genreId, authorId, publisherId);
+            await _dm.EnsureInsertedBookAsync(title, pages, releaseDate, genreId, authorId, publisherId);
 
             // Assert
             Assert.True(IsBookInserted(title, pages, releaseDate, genreId, authorId, publisherId));
         }
 
         [Fact]
-        public async void InsertBookAsync_DuplicatePublisherName_ReturnsExistingEntry()
+        public async void EnsureInsertedBookAsync_DuplicatePublisherName_ReturnsExistingEntry()
         {
             // Arrange
             Genre genre = _db.Genres.First(g => g.Name == "Fiction");
@@ -203,7 +203,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
             int initialCount = 4;
 
             // Act
-            Guid duplacateBookId = await _dm.InsertBookAsync(titleDuplicate,
+            Guid duplacateBookId = await _dm.EnsureInsertedBookAsync(titleDuplicate,
                                                              pagesDuplicate,
                                                              releaseDateDuplicate,
                                                              genreIdDuplicate,
@@ -216,7 +216,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
         }
 
         [Fact]
-        public async void InsertBookAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
+        public async void EnsureInsertedBookAsync_InvalidDatabaseContext_ThrowsInvalidOperationException()
         {
             // Arrange
             Genre genre = _db.Genres.First(g => g.Name == "Fiction");
@@ -233,7 +233,7 @@ namespace BookManager.Tests.UnitTesting.xUnit
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _dm.InsertBookAsync(titleDuplicate,
+                await _dm.EnsureInsertedBookAsync(titleDuplicate,
                                           pagesDuplicate,
                                           releaseDateDuplicate,
                                           genreIdDuplicate,
