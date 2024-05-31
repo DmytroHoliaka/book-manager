@@ -17,7 +17,7 @@ _Follow these steps to get the program set up and running correctly._
 
 ```sh
 
-git clone https://git.foxminded.ua/foxstudent105510/task-5-books.git
+git clone https://github.com/DmytroHoliaka/book-manager.git
 
 ```
 
@@ -25,7 +25,7 @@ git clone https://git.foxminded.ua/foxstudent105510/task-5-books.git
 
 ```sh
 
-cd task-5-books/BookManager
+cd book-manager/BookManager
 
 ```
 
